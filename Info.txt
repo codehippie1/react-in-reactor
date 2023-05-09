@@ -1,0 +1,60 @@
+Tenant = Organization
+Subscription = Well, subscription or money
+Multi-tenant = E.g. Azure is an org and Microsoft is another one, Or Instagram and Whatapp are different orgs but they are owned by Meta
+
+Deploy from Studio
+ - ASPNETCORE_ENVIRONMENT "Production"
+
+REGISTRATIONS
+1. SPA Client App (ReactJS)
+- Create new App registration for ReactJS Client App (AD-App Registration). Call it "Demo SPA"
+  App Registrations | SPA | Authentication Blade -> Select SPA (Single page application) -> Set redirect uris
+        https://demo-aspnet-rect-azure.azurewebsites.net
+        https://demo-aspnet-rect-azure.azurewebsites.net/signin-oidc
+App Registrations | SPA | API Permissions Blade -> Add a permission
+    Microsoft Graph -> Permissions -> Add "Delegated" User.Read permission
+        Admin consent required -> Set to "No"
+APP Registrations | SPA | Manifest Blade -> Edit manifest
+    "accessTokenAcceptedVersion": 2,
+    "signInAudience": "AzureADandPersonalMicrosoftAccount",
+
+App Registrations | SPA -> Get these values
+        Tenant ID - xxx
+        Client ID - xxx
+        Client Secret= xxxx
+
+##########################   API ##############################
+Nuget
+Install Microsoft.Identity.Web.UI
+ - This package enables UI for ASP.NET Core Web apps that use Microsoft.Identity.Web.
+ - https://learn.microsoft.com/en-us/azure/active-directory/develop/microsoft-identity-web
+
+builder.Services.AddMicrosoftIdentityWebApiAuthentication(builder.Configuration, "AzureADAPI");
+app.UseAuthentication();
+app.UseAuthorization();
+
+"AzureADAPI": {
+    "Instance": "https://login.microsoftonline.com/",
+    "Domain": "aneeshlalgagmail.onmicrosoft.com",
+    "TenantId": "8983bdfb-e4cd-4aac-b54b-8fcdc4f0223e",
+    "ClientId": "62386cdd-72fb-4c00-b483-2d7219d5ce3f"
+  }
+
+https://learn.microsoft.com/en-us/azure/active-directory/develop/single-page-app-tutorial-04-call-api?tabs=visual-studio
+
+
+2. Service App (API)
+- Create an new App registration for API. Call it "Demo API"
+  App Registrations | SPA | API Permissions Blade -> Add permissions to Microsoft Graph -> Delegated Permissions - Add User.Read
+  App Registrations | SPA | Expose an API Blade
+        Add a scope named "Call Demo API"
+        State -> Enabled
+        Who Can Consent -> Admin and users
+        Generated URI: api://xxx/TalkToDemoAPI
+APP Registrations | API | Manifest Blade -> Edit manifest
+    "accessTokenAcceptedVersion": 2,
+- From API App Registration get these
+        Tenant ID - xxx
+        Client ID - xxx
+        Client Secret= xxx
+        API Scope = TalkToDemoAPI
